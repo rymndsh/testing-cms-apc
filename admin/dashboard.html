@@ -223,25 +223,23 @@
       // FUNGSI JAVASCRIPT LOGOUT (VERSI SAPU BERSIH)
       // ==========================================
       function prosesLogout(e) {
-        e.preventDefault(); 
-        
-        // 1. Amankan dulu data artikel agar tidak ikut terhapus saat kita bersihkan storage
-        const savedArticles = localStorage.getItem(STORAGE_KEY);
-        
-        // 2. BERSIHKAN SEMUA DATA (Nuclear Option). Ini akan menghapus token/status login apapun namanya.
-        localStorage.clear();
-        sessionStorage.clear();
-        
-        // 3. Kembalikan data artikel yang sudah diamankan tadi ke dalam localStorage
-        if (savedArticles) {
-          localStorage.setItem(STORAGE_KEY, savedArticles);
-        }
+  e.preventDefault(); 
+  
+  // 1. Amankan data artikel sementara
+  const savedArticles = localStorage.getItem("apc_articles_data");
+  
+  // 2. Bersihkan seluruh sesi login (sapu bersih)
+  localStorage.clear();
+  sessionStorage.clear();
+  
+  // 3. Kembalikan data artikel ke storage
+  if (savedArticles) {
+    localStorage.setItem("apc_articles_data", savedArticles);
+  }
 
-        // 4. Force Redirect keluar
-        // Catatan: Saya set ke "../login.html" berasumsi file login ada di luar folder admin. 
-        // Jika file login kamu 1 folder dengan dashboard ini, hapus "../" menjadi "login.html"
-        window.location.replace("/testing-cms-apc/admin/login.html?logout=success&t=" + new Date().getTime()); 
-      }
+  // 4. Redirect bersih, simpel, dan langsung ke file login
+  window.location.replace("login.html"); 
+}
     </script>
   </body>
 </html>

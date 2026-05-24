@@ -220,26 +220,57 @@
         totalBase + uploadedCount;
 
       // ==========================================
-      // FUNGSI JAVASCRIPT LOGOUT (VERSI SAPU BERSIH)
+      // FUNGSI LOGOUT YANG AMAN UNTUK GITHUB PAGES
       // ==========================================
       function prosesLogout(e) {
-  e.preventDefault(); 
-  
-  // 1. Amankan data artikel sementara
-  const savedArticles = localStorage.getItem("apc_articles_data");
-  
-  // 2. Bersihkan seluruh sesi login (sapu bersih)
-  localStorage.clear();
-  sessionStorage.clear();
-  
-  // 3. Kembalikan data artikel ke storage
-  if (savedArticles) {
-    localStorage.setItem("apc_articles_data", savedArticles);
-  }
+        // Cegah default behavior & event bubbling
+        e.preventDefault();
+        e.stopPropagation();
 
-  // 4. Redirect bersih, simpel, dan langsung ke file login
-  window.location.replace("login.html"); 
-}
+        // 1. Hapus HANYA key otentikasi secara spesifik.
+        //    Ini menjamin apc_articles_data (dan data lain) tidak tersentuh.
+        localStorage.removeItem("apc_logged_in");
+        localStorage.removeItem("github_token");
+        sessionStorage.removeItem("apc_logged_in");
+        sessionStorage.removeItem("github_token");
+
+        // 2. Verifikasi bahwa key otentikasi sudah benar-benar terhapus.
+        //    Ini mencegah kasus "stuck" di mana dashboard reload karena
+        //    auth guard masih melihat data login di storage.
+        if (localStorage.getItem("apc_logged_in") || localStorage.getItem("github_token")) {
+          // Fallback: paksa hapus lagi jika belum bersih
+          localStorage.removeItem("apc_logged_in");
+          localStorage.removeItem("github_token");
+        }
+
+        // 3. Bangun URL login.html yang benar relatif terhadap lokasi
+        //    dashboard.html saat ini. Ini menangani semua kasus GitHub Pages:
+        //    - https://user.github.io/repo/admin/dashboard.html
+        //    - https://user.github.io/repo/admin/
+        //    - File lokal (file:///C:/project/admin/dashboard.html)
+        var loginUrl;
+        try {
+          // new URL("login.html", document.baseURI) menggunakan <base> tag
+          // atau URL halaman saat ini sebagai acuan, lalu resolve "login.html"
+          // secara benar sesuai standar URL — tanpa menambahkan timestamp
+          // atau fragment yang tidak diinginkan.
+          loginUrl = new URL("login.html", document.baseURI).href;
+        } catch (_) {
+          // Fallback ultra-aman: ambil path folder dari URL saat ini
+          // dan tambahkan "login.html" secara manual.
+          var path = window.location.pathname;
+          var folder = path.substring(0, path.lastIndexOf("/") + 1);
+          loginUrl = window.location.origin + folder + "login.html";
+        }
+
+        // 4. Redirect menggunakan location.replace agar halaman dashboard
+        //    tidak masuk ke browser history (tombol Back tidak bisa kembali).
+        window.location.replace(loginUrl);
+
+        // 5. Hentikan eksekusi script setelah redirect untuk mencegah
+        //    kode lain (misalnya auth guard) berjalan sebelum navigasi selesai.
+        throw new Error("LOGOUT_REDIRECT");
+      }
     </script>
   </body>
 </html>

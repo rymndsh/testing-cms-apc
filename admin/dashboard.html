@@ -221,12 +221,19 @@
         totalBase + uploadedCount;
 
       // FUNGSI JAVASCRIPT UNTUK LOGOUT ANTI-CACHE
-      function prosesLogout(e) {
-        e.preventDefault(); 
-        
-        // Memaksa browser pindah halaman dan memberikan timestamp unik agar tidak membaca versi cache lama
-        window.location.replace("login.html?t=" + new Date().getTime());
-      }
+     function prosesLogout(e) {
+      e.preventDefault(); 
+  
+  // 1. Hapus status login dari Local Storage
+  // Ganti "isLoggedIn" dengan nama key yang sebenarnya kamu buat saat proses login
+      localStorage.removeItem("isLoggedIn"); 
+  
+  // (Opsional) Jika kamu ingin menghapus SEMUA data storage saat logout:
+  // localStorage.clear();
+
+  // 2. Redirect dengan Cache-buster
+      window.location.replace("login.html?t=" + new Date().getTime()); 
+            }
     </script>
   </body>
 </html>

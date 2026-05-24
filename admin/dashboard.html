@@ -52,13 +52,13 @@
         class="p-6 border-t border-sky-50 mt-auto bg-white rounded-br-[2rem]"
       >
         <a
-          href="login.html"
+          href="#"
           onclick="prosesLogout(event)"
           class="flex items-center justify-center gap-2 text-red-500 hover:bg-red-50 hover:text-red-600 font-semibold rounded-lg transition py-2 text-sm"
-          >
-  <i class="fa-solid fa-arrow-right-from-bracket"></i>
-  Logout
-</a>
+        >
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          Logout
+        </a>
       </div>
     </aside>
 
@@ -219,6 +219,14 @@
         JSON.parse(localStorage.getItem(STORAGE_KEY))?.length || 0;
       document.getElementById("total-articles-metric").innerText =
         totalBase + uploadedCount;
+
+      // FUNGSI JAVASCRIPT UNTUK LOGOUT ANTI-CACHE
+      function prosesLogout(e) {
+        e.preventDefault(); 
+        
+        // Memaksa browser pindah halaman dan memberikan timestamp unik agar tidak membaca versi cache lama
+        window.location.replace("login.html?t=" + new Date().getTime());
+      }
     </script>
   </body>
 </html>

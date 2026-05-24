@@ -51,14 +51,13 @@
       <div
         class="p-6 border-t border-sky-50 mt-auto bg-white rounded-br-[2rem]"
       >
-        <a
-          href="#"
+        <button
           onclick="prosesLogout(event)"
-          class="flex items-center justify-center gap-2 text-red-500 hover:bg-red-50 hover:text-red-600 font-semibold rounded-lg transition py-2 text-sm"
+          class="w-full flex items-center justify-center gap-2 text-red-500 hover:bg-red-50 hover:text-red-600 font-semibold rounded-lg transition py-2 text-sm"
         >
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
           Logout
-        </a>
+        </button>
       </div>
     </aside>
 
@@ -220,20 +219,29 @@
       document.getElementById("total-articles-metric").innerText =
         totalBase + uploadedCount;
 
-      // FUNGSI JAVASCRIPT UNTUK LOGOUT ANTI-CACHE
-     function prosesLogout(e) {
-      e.preventDefault(); 
-  
-  // 1. Hapus status login dari Local Storage
-  // Ganti "isLoggedIn" dengan nama key yang sebenarnya kamu buat saat proses login
-      localStorage.removeItem("isLoggedIn"); 
-  
-  // (Opsional) Jika kamu ingin menghapus SEMUA data storage saat logout:
-  // localStorage.clear();
+      // ==========================================
+      // FUNGSI JAVASCRIPT LOGOUT (VERSI SAPU BERSIH)
+      // ==========================================
+      function prosesLogout(e) {
+        e.preventDefault(); 
+        
+        // 1. Amankan dulu data artikel agar tidak ikut terhapus saat kita bersihkan storage
+        const savedArticles = localStorage.getItem(STORAGE_KEY);
+        
+        // 2. BERSIHKAN SEMUA DATA (Nuclear Option). Ini akan menghapus token/status login apapun namanya.
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // 3. Kembalikan data artikel yang sudah diamankan tadi ke dalam localStorage
+        if (savedArticles) {
+          localStorage.setItem(STORAGE_KEY, savedArticles);
+        }
 
-  // 2. Redirect dengan Cache-buster
-      window.location.replace("login.html?t=" + new Date().getTime()); 
-            }
+        // 4. Force Redirect keluar
+        // Catatan: Saya set ke "../login.html" berasumsi file login ada di luar folder admin. 
+        // Jika file login kamu 1 folder dengan dashboard ini, hapus "../" menjadi "login.html"
+        window.location.replace("../login.html?logout=success&t=" + new Date().getTime()); 
+      }
     </script>
   </body>
 </html>
